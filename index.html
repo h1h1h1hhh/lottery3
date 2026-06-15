@@ -61,9 +61,15 @@ async function load(){
   }catch(e){console.error(e);}
 }
 async function save(){
-  const b=JSON.stringify({message:'r',content:enc(JSON.stringify({w:W})),sha});
-  const r=await fetch(RAW,{method:'PUT',headers:{Authorization:'token '+TK,'Content-Type':'application/json'},body:b});
-  const d=await r.json();sha=d.content.sha;
+  for(let i=0;i<8;i++){
+    try{
+      const b=JSON.stringify({message:'r',content:enc(JSON.stringify({w:W})),sha});
+      const r=await fetch(RAW,{method:'PUT',headers:{Authorization:'token '+TK,'Content-Type':'application/json'},body:b});
+      if(!r.ok){if(r.status===409){await load();await new Promise(x=>setTimeout(x,200+Math.random()*300));continue;}throw new Error('save fail');}
+      const d=await r.json();sha=d.content.sha;return true;
+    }catch(e){await load();await new Promise(x=>setTimeout(x,200+Math.random()*300));}
+  }
+  return false;
 }
 function render(){
   if(ed()){
@@ -92,7 +98,8 @@ async function go(){
     let av=[];R.forEach((r,i)=>{if(W[i].length<r.c)av.push(i);});
     const tier=av[Math.floor(Math.random()*av.length)];
     W[tier].push({n, t:new Date().toISOString()});
-    await save();await load();
+    const ok=await save();await load();
+    if(!ok){document.getElementById('res').innerHTML='<p class="lose">网络繁忙，请重试</p>';busy=false;return;}
     document.getElementById('res').innerHTML='<p style="font-size:3em">🎊</p><p class="win">恭喜 '+n+'！</p><p class="prize">'+R[tier].p+'</p>';
   }else{
     document.getElementById('res').innerHTML='<p style="font-size:3em">😢</p><p class="lose">很遗憾，没有中奖</p>';
