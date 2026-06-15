@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🔑 管理 - 抽奖3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#0a001f;min-height:100vh;display:flex;flex-direction:column;align-items:center;color:#fff;padding:15px}
+h1{color:#ffd700;font-size:1.3em;margin:15px 0}
+h2{color:#ffd700;font-size:1em;margin:10px 0}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:15px;max-width:400px;width:100%;margin:8px 0}
+.c{color:#aaa;font-size:.85em;margin:5px 0}
+.w{display:inline-block;background:rgba(255,215,0,.15);color:#ffd700;padding:6px 12px;border-radius:8px;margin:3px;font-size:.8em;cursor:pointer}
+.w:hover{background:rgba(255,0,0,.3)}
+.btn{padding:12px 25px;border:none;border-radius:20px;font-size:.9em;font-weight:bold;cursor:pointer;margin:5px}
+.b1{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033}
+.b2{background:transparent;border:1px solid #f66;color:#f66;font-size:.8em;padding:8px 18px}
+.b3{background:transparent;border:1px solid #4af;color:#4af;font-size:.8em;padding:8px 18px}
+input{padding:8px 12px;border-radius:15px;border:1px solid rgba(255,215,0,.5);background:rgba(255,255,255,.08);color:#fff;font-size:.9em;width:140px;margin:5px}
+.msg{color:#4af;font-size:.8em;margin:8px 0}
+</style>
+</head>
+<body>
+<h1>🔑 抽奖3 管理</h1>
+<div class="card"><h2>📊 实时数据</h2><div id="data"></div></div>
+<div class="card">
+  <h2>🔧 操作</h2>
+  <button class="btn b1" onclick="loadData()">🔄 刷新</button>
+  <button class="btn b2" onclick="resetAll()">🔄 重置全部</button>
+  <button class="btn b3" onclick="localStorage.clear();q()">🔓 解本机锁</button>
+  <p class="c">输入名字移除中奖记录（重新可抽）：</p>
+  <input id="uname" placeholder="输入名字"><button class="btn" style="font-size:.8em;padding:8px 15px" onclick="unlock()">解除</button>
+</div>
+<div class="msg" id="msg"></div>
+
+<script>
+const RAW='https://api.github.com/repos/h1h1h1hhh/lottery3/contents/state.json';
+const TK='ghp_'+'K9nIgzCtyWhjjCUTQTLatVnUEgbEXO1Bidv5';
+const R=['🥇一等奖:电饭煲+啤酒+门票','🥈二等奖:啤酒+门票+风扇','🥉三等奖:啤酒+门票'];
+let sha='',W={0:[],1:[],2:[]};
+function enc(s){const u=new TextEncoder().encode(s);return btoa(String.fromCharCode(...u));}
+function dec(b){const a=atob(b);const u=new Uint8Array([...a].map(c=>c.charCodeAt(0)));return new TextDecoder().decode(u);}
+async function loadData(){
+  try{
+    const r=await fetch(RAW,{headers:{Authorization:'token '+TK},cache:'no-cache'});
+    const d=await r.json();sha=d.sha;const s=JSON.parse(dec(d.content));W=s.w||{0:[],1:[],2:[]};
+    let h='';let t=0;
+    R.forEach((l,i)=>{const w=W[i]||[];t+=w.length;h+='<p class="c">'+l+'（'+w.length+'人）</p>';w.forEach(x=>{h+='<span class="w" onclick="rm(\''+i+'\',\''+(x.n||x)+'\')">'+x.n+'<br><span style="font-size:.7em;color:#888">'+new Date(x.t).toLocaleString()+'</span></span>';})});
+    h='<p class="c">已抽：'+t+'/9 人</p>'+h;
+    document.getElementById('data').innerHTML=h;
+  }catch(e){document.getElementById('msg').textContent='加载失败'}
+}
+async function save(W2){
+  const s={w:W2};const b=JSON.stringify({message:'a',content:enc(JSON.stringify(s)),sha});
+  const r=await fetch(RAW,{method:'PUT',headers:{Authorization:'token '+TK,'Content-Type':'application/json'},body:b});
+  const d=await r.json();sha=d.content.sha;
+}
+async function resetAll(){if(!confirm('确定重置？'))return;await save({0:[],1:[],2:[]});await loadData();q('已重置');}
+async function unlock(){
+  const n=document.getElementById('uname').value.trim();if(!n)return;
+  await loadData();let found=false;
+  for(let i=0;i<3;i++){W[i]=(W[i]||[]).filter(x=>{if((x.n||x)===n){found=true;return false}return true});}
+  if(found){await save(W);await loadData();q('已解除：'+n);}else{q('未找到：'+n);}
+}
+function rm(i,n){if(confirm('移除 '+n+'？')){W[i]=(W[i]||[]).filter(x=>(x.n||x)!==n);save(W).then(loadData);}}
+function q(m){document.getElementById('msg').textContent=m||'';}
+loadData();setInterval(loadData,10000);
+</script>
+</body>
+</html>
