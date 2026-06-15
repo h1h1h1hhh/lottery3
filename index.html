@@ -80,7 +80,7 @@ async function go(){
   await load();
   if(totalWon()>=totalAll()){showEnd();busy=false;return}
   const wn=totalWon();const rm=totalAll()-wn;
-  const wr=Math.min(rm/Math.max(50-wn,rm),.6);
+  const wr=Math.min(rm/Math.max(30-wn,rm),.6);
   if(Math.random()<wr){
     let rnd=Math.random(),tier=-1,cum=0;
     for(let i=0;i<R.length;i++){if((W[i]||[]).length>=R[i].count)continue;cum+=R[i].rate;if(rnd<cum){tier=i;break;}}
