@@ -46,7 +46,7 @@ async function loadData(){
     const r=await fetch(RAW,{headers:{Authorization:'token '+TK},cache:'no-cache'});
     const d=await r.json();sha=d.sha;const s=JSON.parse(dec(d.content));W=s.w||{0:[],1:[],2:[]};
     let h='';let t=0;
-    R.forEach((l,i)=>{const w=W[i]||[];t+=w.length;h+='<p class="c">'+l+'（'+w.length+'人）</p>';w.forEach(x=>{h+='<span class="w" onclick="rm(\''+i+'\',\''+(x.n||x)+'\')">'+x.n+'<br><span style="font-size:.7em;color:#888">'+new Date(x.t).toLocaleString()+'</span></span>';})});
+    R.forEach((l,i)=>{const w=W[i]||[];t+=w.length;h+='<p class="c">'+l+'（'+w.length+'人）</p>';w.forEach(x=>{h+='<span class="w" onclick="rm(\''+i+'\',\''+(x.n||x)+'\')">'+x.n+'<br><span style="font-size:.7em;color:#888">'+new Date(x.t).toLocaleString()+'.'+x.t.slice(20,23)+'</span></span>';})});
     h='<p class="c">已抽：'+t+'/9 人</p>'+h;
     document.getElementById('data').innerHTML=h;
   }catch(e){document.getElementById('msg').textContent='加载失败'}
