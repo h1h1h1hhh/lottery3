@@ -25,13 +25,16 @@ input:focus{border-color:#ffd700}
 <body>
 <div class="card">
   <h1>🎰 幸运抽奖</h1>
-  <div class="rules">
-    <span>📋 奖项设置：</span><br>
+  <div class="rules" id="rulesBox" style="cursor:pointer" onclick="toggleRules()">
+    📋 中奖规则 ▾
+  </div>
+  <div id="rulesDetail" style="display:none;background:rgba(0,0,0,.2);border-radius:12px;padding:12px;margin:8px 0;font-size:.75em;color:#aaa;text-align:left;line-height:1.6">
     🥇 一等奖×1：燕京啤酒2箱+凤仪湾门票×2+电饭煲1台<br>
     🥈 二等奖×3：啤酒1箱+凤仪湾门票×1+电风扇1把<br>
     🥉 三等奖×5：啤酒6瓶+凤仪湾门票×1<br>
-    <span>🎯 中奖率：</span>一10% / 二30% / 三60%<br>
-    <span>⚠️ 每人仅限一次，以时间戳为准，先中先得</span>
+    <hr style="border-color:#333;margin:8px 0">
+    ⚠️ 每人仅限抽奖一次<br>
+    ⚠️ 如因系统原因导致同一奖品被多人抽中，以最先抽中的记录为准<br>
   </div>
   <div id="content">
     <input id="nameInput" placeholder="请输入你的名字">
@@ -93,6 +96,7 @@ async function go(){
   }else{localStorage.setItem('l3d','1');showLose();}
   busy=false;
 }
+function toggleRules(){var d=document.getElementById('rulesDetail');var b=document.getElementById('rulesBox');if(d.style.display==='none'){d.style.display='block';b.innerHTML='📋 中奖规则 ▴';}else{d.style.display='none';b.innerHTML='📋 中奖规则 ▾';}}
 function showWin(name,prize,tm){
   document.getElementById('content').innerHTML='';
   document.getElementById('result').innerHTML='<p style="font-size:3em">🎊</p><p class="win">恭喜 '+name+'！</p><p class="prize">'+prize+'</p>'+(tm?'<p class="time">⏰ '+new Date(tm).toLocaleString()+'</p>':'')+'<p style="color:#aaa;font-size:.8em;margin-top:10px">请到领奖处领取</p>';
