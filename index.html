@@ -6,104 +6,101 @@
 <title>🎉 幸运抽奖</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#0a001f,#1a0033 50%,#0d0028);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:20px}
-.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,215,0,.2);border-radius:20px;padding:25px;max-width:380px;width:100%;text-align:center}
-h1{font-size:1.3em;color:#ffd700;margin-bottom:15px}
-.rules{background:rgba(0,0,0,.2);border-radius:12px;padding:12px;margin:10px 0;font-size:.75em;color:#aaa;text-align:left;line-height:1.6}
-.rules span{color:#ffd700}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#0a001f,#1a0033 50%,#0d0028);min-height:100vh;display:flex;flex-direction:column;align-items:center;color:#fff;padding:15px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,215,0,.2);border-radius:20px;padding:25px;max-width:400px;width:100%;text-align:center;margin:10px 0}
+h1{font-size:1.3em;color:#ffd700;margin-bottom:10px}
+.rules{cursor:pointer;color:#aaa;font-size:.8em;margin:8px 0;padding:8px;background:rgba(0,0,0,.2);border-radius:8px}
+.rules-detail{display:none;background:rgba(0,0,0,.2);border-radius:12px;padding:12px;margin:8px 0;font-size:.75em;color:#aaa;text-align:left;line-height:1.6}
 input{width:100%;padding:12px;border-radius:25px;border:2px solid rgba(255,215,0,.5);background:rgba(255,255,255,.08);color:#fff;font-size:1em;text-align:center;margin:10px 0;outline:none}
 input:focus{border-color:#ffd700}
 .btn{padding:13px 35px;border:none;border-radius:25px;font-size:1em;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a0033;margin:8px 0}
-.btn:disabled{opacity:.4;pointer-events:none}
-.win{color:#ffd700;font-size:1.3em;font-weight:bold}
+.win{color:#ffd700;font-size:1.2em;font-weight:bold}
 .lose{color:#aaa}
-.prize{color:#ffd700;font-size:.95em;margin-top:5px}
-.time{color:#888;font-size:.75em;margin-top:5px}
+.prize{color:#ffd700;font-size:.9em;margin-top:5px}
 .ended{color:#f66;font-size:1.1em;font-weight:bold}
+.wlist{text-align:left;font-size:.8em;margin-top:10px;line-height:1.8}
+.wlist .t{color:#ffd700;font-weight:bold}
+.wlist .n{color:#fff;margin-left:5px}
 </style>
 </head>
 <body>
 <div class="card">
   <h1>🎰 幸运抽奖</h1>
-  <div class="rules" id="rulesBox" style="cursor:pointer" onclick="toggleRules()">
-    📋 中奖规则 ▾
-  </div>
-  <div id="rulesDetail" style="display:none;background:rgba(0,0,0,.2);border-radius:12px;padding:12px;margin:8px 0;font-size:.75em;color:#aaa;text-align:left;line-height:1.6">
+  <div class="rules" id="rb" onclick="tg()">📋 中奖规则 ▾</div>
+  <div class="rules-detail" id="rd">
     🥇 一等奖×1：燕京啤酒2箱+凤仪湾门票×2+电饭煲1台<br>
     🥈 二等奖×3：啤酒1箱+凤仪湾门票×1+电风扇1把<br>
     🥉 三等奖×5：啤酒6瓶+凤仪湾门票×1<br>
-    <hr style="border-color:#333;margin:8px 0">
-    ⚠️ 每人仅限抽奖一次<br>
-    ⚠️ 如因系统原因导致同一奖品被多人抽中，以最先抽中的记录为准<br>
+    <hr style="border-color:#333;margin:6px 0">
+    ⚠️ 如系统原因导致一奖多人，以最先抽中为准<br>
+    ⚠️ 同一名字不可重复使用
   </div>
-  <div id="content">
-    <input id="nameInput" placeholder="请输入你的名字">
-    <br><button class="btn" id="btn" onclick="go()">🎯 抽奖</button>
-  </div>
-  <div class="result" id="result"></div>
+  <div id="area"></div>
 </div>
 
 <script>
 const RAW='https://api.github.com/repos/h1h1h1hhh/lottery3/contents/state.json';
 const TK='ghp_'+'K9nIgzCtyWhjjCUTQTLatVnUEgbEXO1Bidv5';
 const R=[
-  {name:'🥇 一等奖',prize:'燕京啤酒2箱+凤仪湾门票×2+电饭煲1台',count:1,rate:.10},
-  {name:'🥈 二等奖',prize:'啤酒1箱+凤仪湾门票×1+电风扇1把',count:3,rate:.30},
-  {name:'🥉 三等奖',prize:'啤酒6瓶+凤仪湾门票×1',count:5,rate:.60},
+  {n:'🥇 一等奖',p:'燕京啤酒2箱+凤仪湾门票×2+电饭煲1台',c:1},
+  {n:'🥈 二等奖',p:'啤酒1箱+凤仪湾门票×1+电风扇1把',c:3},
+  {n:'🥉 三等奖',p:'啤酒6瓶+凤仪湾门票×1',c:5},
 ];
-let W={0:[],1:[],2:[]},sha='',me='',busy=false;
+let W={0:[],1:[],2:[]},sha='',busy=false;
 function enc(s){const u=new TextEncoder().encode(s);return btoa(String.fromCharCode(...u));}
 function dec(b){const a=atob(b);const u=new Uint8Array([...a].map(c=>c.charCodeAt(0)));return new TextDecoder().decode(u);}
+function tg(){var d=document.getElementById('rd');var b=document.getElementById('rb');if(d.style.display==='none'){d.style.display='block';b.innerHTML='📋 中奖规则 ▴';}else{d.style.display='none';b.innerHTML='📋 中奖规则 ▾';}}
+function an(){return Object.values(W).flat().map(x=>x.n);}
+function tw(){return an().length;}
+function ta(){return 9;}
+function ed(){return tw()>=ta();}
 async function load(){
   try{
     const r=await fetch(RAW,{headers:{Authorization:'token '+TK},cache:'no-cache'});
-    const d=await r.json();sha=d.sha;
-    const s=JSON.parse(dec(d.content));W=s.w||{0:[],1:[],2:[]};
+    const d=await r.json();sha=d.sha;W=JSON.parse(dec(d.content)).w||{0:[],1:[],2:[]};
   }catch(e){console.error(e);}
 }
 async function save(){
-  const s={w:W};
-  const b=JSON.stringify({message:'r',content:enc(JSON.stringify(s)),sha});
+  const b=JSON.stringify({message:'r',content:enc(JSON.stringify({w:W})),sha});
   const r=await fetch(RAW,{method:'PUT',headers:{Authorization:'token '+TK,'Content-Type':'application/json'},body:b});
   const d=await r.json();sha=d.content.sha;
 }
-function won(){return Object.values(W).flat().map(x=>x.n||x);}
-function totalWon(){return won().length;}
-function totalAll(){return 9;}
+function render(){
+  if(ed()){
+    let h='<p style="font-size:3em">🎊</p><p class="ended">抽奖已结束</p><div class="wlist">';
+    R.forEach((r,i)=>{if(W[i].length>0){h+='<p class="t">'+r.n+'</p>';W[i].forEach(x=>{h+='<span class="n">🏆 '+x.n+'</span><br>';});}});
+    h+='</div>';document.getElementById('area').innerHTML=h;
+  }else{
+    document.getElementById('area').innerHTML='<input id="ni" placeholder="请输入你的名字"><br><button class="btn" onclick="go()">🎯 抽奖</button><div id="res"></div>';
+  }
+}
 async function go(){
   if(busy)return;
-  if(localStorage.getItem('l3d')){document.getElementById('result').innerHTML='<p class="lose">每人只能抽一次哦</p>';return}
-  const n=document.getElementById('nameInput').value.trim();
-  if(!n){document.getElementById('result').innerHTML='<p class="lose">请输入名字</p>';return}
-  me=n;busy=true;document.getElementById('btn').disabled=true;document.getElementById('btn').textContent='抽奖中...';
+  const n=document.getElementById('ni').value.trim();
+  if(!n){document.getElementById('res').innerHTML='<p class="lose">请输入名字</p>';return}
   await load();
-  if(totalWon()>=totalAll()){showEnd();busy=false;return}
-  if(won().includes(me)){let p='';R.forEach((r,i)=>{if((W[i]||[]).some(x=>(x.n||x)===me))p=r.prize;});showWin(me,p,'');busy=false;return}
+  if(an().includes(n)){document.getElementById('res').innerHTML='<p class="lose">该名字已被使用，请换一个</p>';return}
+  if(ed()){render();return}
+  busy=true;
+  document.getElementById('res').innerHTML='<p style="color:#ffd700">抽奖中...</p>';
   await new Promise(r=>setTimeout(r,1500+Math.random()*1500));
   await load();
-  if(totalWon()>=totalAll()){showEnd();busy=false;return}
-  const wn=totalWon();const rm=totalAll()-wn;
-  const wr=Math.min(rm/Math.max(30-wn,rm),.6);
+  if(ed()){render();busy=false;return}
+  const wn=tw();const rm=ta()-wn;
+  const wr=Math.min(rm/Math.max(10-wn,rm),.8);
   if(Math.random()<wr){
-    let rnd=Math.random(),tier=-1,cum=0;
-    for(let i=0;i<R.length;i++){if((W[i]||[]).length>=R[i].count)continue;cum+=R[i].rate;if(rnd<cum){tier=i;break;}}
-    if(tier<0)tier=2;
-    const now=new Date().toISOString();
-    (W[tier]=W[tier]||[]).push({n:me,t:now});
-    await save();
-    localStorage.setItem('l3d','1');
-    showWin(me,R[tier].prize,now);
-  }else{localStorage.setItem('l3d','1');showLose();}
+    let av=[];R.forEach((r,i)=>{if(W[i].length<r.c)av.push(i);});
+    const tier=av[Math.floor(Math.random()*av.length)];
+    W[tier].push({n, t:new Date().toISOString()});
+    await save();await load();
+    document.getElementById('res').innerHTML='<p style="font-size:3em">🎊</p><p class="win">恭喜 '+n+'！</p><p class="prize">'+R[tier].p+'</p>';
+  }else{
+    document.getElementById('res').innerHTML='<p style="font-size:3em">😢</p><p class="lose">很遗憾，没有中奖</p>';
+  }
+  if(ed()){setTimeout(render,1500);}
   busy=false;
 }
-function toggleRules(){var d=document.getElementById('rulesDetail');var b=document.getElementById('rulesBox');if(d.style.display==='none'){d.style.display='block';b.innerHTML='📋 中奖规则 ▴';}else{d.style.display='none';b.innerHTML='📋 中奖规则 ▾';}}
-function showWin(name,prize,tm){
-  document.getElementById('content').innerHTML='';
-  document.getElementById('result').innerHTML='<p style="font-size:3em">🎊</p><p class="win">恭喜 '+name+'！</p><p class="prize">'+prize+'</p>'+(tm?'<p class="time">⏰ '+new Date(tm).toLocaleString()+'</p>':'')+'<p style="color:#aaa;font-size:.8em;margin-top:10px">请到领奖处领取</p>';
-}
-function showLose(){document.getElementById('content').innerHTML='';document.getElementById('result').innerHTML='<p style="font-size:3em">😢</p><p class="lose">很遗憾，没有中奖</p>';}
-function showEnd(){document.getElementById('content').innerHTML='';document.getElementById('result').innerHTML='<p style="font-size:3em">🎊</p><p class="ended">抽奖已结束</p>';}
-load();
+load().then(render);
 </script>
 </body>
 </html>
