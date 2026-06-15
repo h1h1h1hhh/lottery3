@@ -74,7 +74,7 @@ async function save(){
 function render(){
   if(ed()){
     let h='<p style="font-size:3em">🎊</p><p class="ended">抽奖已结束</p><div class="wlist">';
-    R.forEach((r,i)=>{if(W[i].length>0){h+='<p class="t">'+r.n+'</p>';W[i].forEach(x=>{h+='<span class="n">🏆 '+x.n+'</span><br>';});}});
+    R.forEach((r,i)=>{if(W[i].length>0){h+='<p class="t">'+r.n+'</p>';W[i].forEach(x=>{h+='<span class="n">🏆 '+x.n+' ('+new Date(x.t).toLocaleString()+'.'+x.t.slice(20,23)+')</span><br>';});}});
     h+='</div>';document.getElementById('area').innerHTML=h;
   }else{
     document.getElementById('area').innerHTML='<input id="ni" placeholder="请输入你的名字"><br><button class="btn" onclick="go()">🎯 抽奖</button><div id="res"></div>';
