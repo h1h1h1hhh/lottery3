@@ -29,8 +29,8 @@ input:focus{border-color:#ffd700}
   <div class="rules" id="rb" onclick="tg()">📋 中奖规则 ▾</div>
   <div class="rules-detail" id="rd">
     🥇 一等奖×1：燕京啤酒2箱+凤仪湾门票×2+电饭煲1台<br>
-    🥈 二等奖×3：啤酒1箱+凤仪湾门票×1+电风扇1把<br>
-    🥉 三等奖×5：啤酒6瓶+凤仪湾门票×1<br>
+    🥈 二等奖×3：啤酒1箱+凤仪湾门票1张+电风扇1把<br>
+    🥉 三等奖×5：啤酒6瓶+凤仪湾门票1张<br>
     <hr style="border-color:#333;margin:6px 0">
         <hr style="border-color:#555;margin:6px 0">
     📌 本活动最终解释权归主办方所有<br>
@@ -48,8 +48,8 @@ const RAW='https://api.github.com/repos/h1h1h1hhh/lottery3/contents/state.json';
 const TK='ghp_'+'K9nIgzCtyWhjjCUTQTLatVnUEgbEXO1Bidv5';
 const R=[
   {n:'🥇 一等奖',p:'燕京啤酒2箱+凤仪湾门票×2+电饭煲1台',c:1},
-  {n:'🥈 二等奖',p:'啤酒1箱+凤仪湾门票×1+电风扇1把',c:3},
-  {n:'🥉 三等奖',p:'啤酒6瓶+凤仪湾门票×1',c:5},
+  {n:'🥈 二等奖',p:'啤酒1箱+凤仪湾门票1张+电风扇1把',c:3},
+  {n:'🥉 三等奖',p:'啤酒6瓶+凤仪湾门票1张',c:5},
 ];
 let W={0:[],1:[],2:[]},sha='',busy=false;
 function enc(s){const u=new TextEncoder().encode(s);return btoa(String.fromCharCode(...u));}
